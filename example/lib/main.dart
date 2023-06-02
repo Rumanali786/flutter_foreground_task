@@ -23,9 +23,9 @@ class MyTaskHandler extends TaskHandler {
     _sendPort = sendPort;
 
     // You can use the getData function to get the stored data.
-    final customData =
-        await FlutterForegroundTask.getData<String>(key: 'customData');
-    print('customData: $customData');
+    // final customData =
+    //     await FlutterForegroundTask.getData<String>(key: 'customData');
+    // print('customData: $customData');
   }
 
   // Called every [interval] milliseconds in [ForegroundTaskOptions].
@@ -133,8 +133,7 @@ class _ExamplePageState extends State<ExamplePage> {
         id: 500,
         channelId: 'notification_channel_id',
         channelName: 'Foreground Notification',
-        channelDescription:
-            'This notification appears when the foreground service is running.',
+        channelDescription: 'This notification appears when the foreground service is running.',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
         iconData: const NotificationIconData(
@@ -172,7 +171,7 @@ class _ExamplePageState extends State<ExamplePage> {
 
   Future<bool> _startForegroundTask() async {
     // You can save data using the saveData function.
-    await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
+    // await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
 
     // Register the receivePort before starting the service.
     final ReceivePort? receivePort = FlutterForegroundTask.receivePort;

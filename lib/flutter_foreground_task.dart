@@ -5,20 +5,21 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/exception/foreground_task_exception.dart';
+import 'package:flutter_foreground_task/models/android_notification_options.dart';
 import 'package:flutter_foreground_task/models/foreground_task_options.dart';
 import 'package:flutter_foreground_task/models/ios_notification_options.dart';
-import 'package:flutter_foreground_task/models/android_notification_options.dart';
 import 'package:flutter_foreground_task/models/notification_permission.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'flutter_foreground_task_platform_interface.dart';
 
 export 'package:flutter_foreground_task/exception/foreground_task_exception.dart';
+export 'package:flutter_foreground_task/models/android_notification_options.dart';
 export 'package:flutter_foreground_task/models/foreground_task_options.dart';
 export 'package:flutter_foreground_task/models/ios_notification_options.dart';
 export 'package:flutter_foreground_task/models/notification_button.dart';
 export 'package:flutter_foreground_task/models/notification_channel_importance.dart';
 export 'package:flutter_foreground_task/models/notification_icon_data.dart';
-export 'package:flutter_foreground_task/models/android_notification_options.dart';
 export 'package:flutter_foreground_task/models/notification_permission.dart';
 export 'package:flutter_foreground_task/models/notification_priority.dart';
 export 'package:flutter_foreground_task/models/notification_visibility.dart';
@@ -90,8 +91,7 @@ class FlutterForegroundTask {
   }
 
   /// Restart the foreground service.
-  static Future<bool> restartService() =>
-      FlutterForegroundTaskPlatform.instance.restartService();
+  static Future<bool> restartService() => FlutterForegroundTaskPlatform.instance.restartService();
 
   /// Update the foreground service.
   static Future<bool> updateService({
@@ -108,104 +108,97 @@ class FlutterForegroundTask {
       );
 
   /// Stop the foreground service.
-  static Future<bool> stopService() =>
-      FlutterForegroundTaskPlatform.instance.stopService();
+  static Future<bool> stopService() => FlutterForegroundTaskPlatform.instance.stopService();
 
   /// Returns whether the foreground service is running.
-  static Future<bool> get isRunningService =>
-      FlutterForegroundTaskPlatform.instance.isRunningService;
+  static Future<bool> get isRunningService => FlutterForegroundTaskPlatform.instance.isRunningService;
 
   /// Get the [ReceivePort].
   static ReceivePort? get receivePort => _registerPort();
 
   /// Get the stored data with [key].
-  static Future<T?> getData<T>({required String key}) async {
-    final prefs = await SharedPreferences.getInstance()
-      ..reload();
-    final data = prefs.get(_kPrefsKeyPrefix + key);
-    return (data is T) ? data : null;
-  }
-
-  /// Get all stored data.
-  static Future<Map<String, Object>> getAllData() async {
-    final prefs = await SharedPreferences.getInstance()
-      ..reload();
-    final dataList = <String, Object>{};
-    for (final prefsKey in prefs.getKeys()) {
-      if (prefsKey.contains(_kPrefsKeyPrefix)) {
-        final data = prefs.get(prefsKey);
-        if (data != null) {
-          final originKey = prefsKey.replaceAll(_kPrefsKeyPrefix, '');
-          dataList[originKey] = data;
-        }
-      }
-    }
-
-    return dataList;
-  }
-
-  /// Save data with [key].
-  static Future<bool> saveData({
-    required String key,
-    required Object value,
-  }) async {
-    final prefs = await SharedPreferences.getInstance()
-      ..reload();
-    final prefsKey = _kPrefsKeyPrefix + key;
-
-    if (value is int) {
-      return prefs.setInt(prefsKey, value);
-    } else if (value is double) {
-      return prefs.setDouble(prefsKey, value);
-    } else if (value is String) {
-      return prefs.setString(prefsKey, value);
-    } else if (value is bool) {
-      return prefs.setBool(prefsKey, value);
-    } else {
-      return false;
-    }
-  }
+  // static Future<T?> getData<T>({required String key}) async {
+  //   final prefs = await SharedPreferences.getInstance()
+  //     ..reload();
+  //   final data = prefs.get(_kPrefsKeyPrefix + key);
+  //   return (data is T) ? data : null;
+  // }
+  //
+  // /// Get all stored data.
+  // static Future<Map<String, Object>> getAllData() async {
+  //   final prefs = await SharedPreferences.getInstance()
+  //     ..reload();
+  //   final dataList = <String, Object>{};
+  //   for (final prefsKey in prefs.getKeys()) {
+  //     if (prefsKey.contains(_kPrefsKeyPrefix)) {
+  //       final data = prefs.get(prefsKey);
+  //       if (data != null) {
+  //         final originKey = prefsKey.replaceAll(_kPrefsKeyPrefix, '');
+  //         dataList[originKey] = data;
+  //       }
+  //     }
+  //   }
+  //
+  //   return dataList;
+  // }
+  //
+  // /// Save data with [key].
+  // static Future<bool> saveData({
+  //   required String key,
+  //   required Object value,
+  // }) async {
+  //   final prefs = await SharedPreferences.getInstance()
+  //     ..reload();
+  //   final prefsKey = _kPrefsKeyPrefix + key;
+  //
+  //   if (value is int) {
+  //     return prefs.setInt(prefsKey, value);
+  //   } else if (value is double) {
+  //     return prefs.setDouble(prefsKey, value);
+  //   } else if (value is String) {
+  //     return prefs.setString(prefsKey, value);
+  //   } else if (value is bool) {
+  //     return prefs.setBool(prefsKey, value);
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
   /// Remove data with [key].
-  static Future<bool> removeData({required String key}) async {
-    final prefs = await SharedPreferences.getInstance()
-      ..reload();
-    return prefs.remove(_kPrefsKeyPrefix + key);
-  }
-
-  /// Clears all stored data.
-  static Future<bool> clearAllData() async {
-    final prefs = await SharedPreferences.getInstance()
-      ..reload();
-    for (final prefsKey in prefs.getKeys()) {
-      if (prefsKey.contains(_kPrefsKeyPrefix)) {
-        await prefs.remove(prefsKey);
-      }
-    }
-
-    return true;
-  }
+  // static Future<bool> removeData({required String key}) async {
+  //   final prefs = await SharedPreferences.getInstance()
+  //     ..reload();
+  //   return prefs.remove(_kPrefsKeyPrefix + key);
+  // }
+  //
+  // /// Clears all stored data.
+  // static Future<bool> clearAllData() async {
+  //   final prefs = await SharedPreferences.getInstance()
+  //     ..reload();
+  //   for (final prefsKey in prefs.getKeys()) {
+  //     if (prefsKey.contains(_kPrefsKeyPrefix)) {
+  //       await prefs.remove(prefsKey);
+  //     }
+  //   }
+  //
+  //   return true;
+  // }
 
   /// Minimize the app to the background.
-  static void minimizeApp() =>
-      FlutterForegroundTaskPlatform.instance.minimizeApp();
+  static void minimizeApp() => FlutterForegroundTaskPlatform.instance.minimizeApp();
 
   /// Launch the app at [route] if it is not running otherwise open it.
-  static void launchApp([String? route]) =>
-      FlutterForegroundTaskPlatform.instance.launchApp(route);
+  static void launchApp([String? route]) => FlutterForegroundTaskPlatform.instance.launchApp(route);
 
   /// Toggles lockScreen visibility
   static void setOnLockScreenVisibility(bool isVisible) =>
-      FlutterForegroundTaskPlatform.instance
-          .setOnLockScreenVisibility(isVisible);
+      FlutterForegroundTaskPlatform.instance.setOnLockScreenVisibility(isVisible);
 
   /// Returns whether the app is in the foreground.
-  static Future<bool> get isAppOnForeground =>
-      FlutterForegroundTaskPlatform.instance.isAppOnForeground;
+  static Future<bool> get isAppOnForeground => FlutterForegroundTaskPlatform.instance.isAppOnForeground;
 
   /// Wake up the screen of a device that is turned off.
-  static void wakeUpScreen() =>
-      FlutterForegroundTaskPlatform.instance.wakeUpScreen();
+  static void wakeUpScreen() => FlutterForegroundTaskPlatform.instance.wakeUpScreen();
 
   /// Returns whether the app has been excluded from battery optimization.
   static Future<bool> get isIgnoringBatteryOptimizations =>
@@ -213,22 +206,19 @@ class FlutterForegroundTask {
 
   /// Open the settings page where you can set ignore battery optimization.
   static Future<bool> openIgnoreBatteryOptimizationSettings() =>
-      FlutterForegroundTaskPlatform.instance
-          .openIgnoreBatteryOptimizationSettings();
+      FlutterForegroundTaskPlatform.instance.openIgnoreBatteryOptimizationSettings();
 
   /// Request to ignore battery optimization.
   static Future<bool> requestIgnoreBatteryOptimization() =>
       FlutterForegroundTaskPlatform.instance.requestIgnoreBatteryOptimization();
 
   /// Returns whether the "android.permission.SYSTEM_ALERT_WINDOW" permission was granted.
-  static Future<bool> get canDrawOverlays =>
-      FlutterForegroundTaskPlatform.instance.canDrawOverlays;
+  static Future<bool> get canDrawOverlays => FlutterForegroundTaskPlatform.instance.canDrawOverlays;
 
   /// Open the settings page where you can allow/deny the "android.permission.SYSTEM_ALERT_WINDOW" permission.
   /// pass the `forceOpen` bool to open the permissions page even if granted.
   static Future<bool> openSystemAlertWindowSettings({bool forceOpen = false}) =>
-      FlutterForegroundTaskPlatform.instance
-          .openSystemAlertWindowSettings(forceOpen: forceOpen);
+      FlutterForegroundTaskPlatform.instance.openSystemAlertWindowSettings(forceOpen: forceOpen);
 
   /// Returns "android.permission.POST_NOTIFICATIONS" permission status.
   ///
@@ -247,8 +237,7 @@ class FlutterForegroundTask {
   /// It must always be called from a top-level function, otherwise foreground task will not work.
   static void setTaskHandler(TaskHandler handler) {
     // Create a method channel to communicate with the platform.
-    const backgroundChannel =
-        MethodChannel('flutter_foreground_task/background');
+    const backgroundChannel = MethodChannel('flutter_foreground_task/background');
 
     // Binding the framework to the flutter engine.
     WidgetsFlutterBinding.ensureInitialized();
